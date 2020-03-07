@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cy.pj.sys.dao.SysLogDao">
+
+    <insert id="insertObject"
+            parameterType="com.cy.pj.sys.entity.SysLog">
+           insert into sys_logs
+           (username,operation,method,params,time,ip,createdTime)
+           values
+           (#{username},#{operation},#{method},#{params},#{time},#{ip},#{createdTime})
+    </insert>
+    
+    <!-- 基于多个id删除日志记录 -->
+    <!--  方法1 (可能存在可靠性,性能问题)
+    <delete id="deleteObjects">
+          delete from sys_logs
+          where 1=2
+          <if test="ids!=null and ids.length>0">
+           or id in 
+           <foreach collection="ids"
+                   open="("
+                   close=")"
+                   separator=","
+                   item="id">
+                   #{id}
+           </foreach>
+          </if>
+     </delete>
+     -->
+     <!--  
+      <delete id="deleteObjects">
+          delete from sys_logs
+          where 1=2 
+          <if test="ids!=null and ids.length>0">
+           or 
+           <foreach collection="ids"
+                   open="("
+                   close=")"
+                   separator="or"
+                   item="id">
+                   id=#{id}
+           </foreach>
+          </if>
+     </delete>
+     -->
+      <delete id="deleteObjects">
+       delete from sys_logs
+       <choose>
+         <when test="ids!=null and ids.length>0">
+           <where>
+              <foreach collection="ids"
+                        item="id"
+                        separator="or">
+                  id=#{id}
+              </foreach>
+           </where>
+         </when>
+         <otherwise>
+          where id=-1
+         </otherwise>
+       </choose>
+    </delete>
+     
+
+    <!-- 通过sql元素定义sql共性代码,其它地方用到了使用include进行包含 -->
+    <sql id="queryWhereId">
+          from sys_logs
+          <where>
+             <if test="username!=null and username!=''">
+                username like concat("%",#{username},"%")
+             </if>
+          </where>   
+    </sql>
+    <!-- 基于用户名,动态拼接sql实现数据查询 -->
+    <select id="getRowCount" resultType="int">
+          select count(*)
+          <include refid="queryWhereId"/>    
+    </select>
+    <!-- 基于查询条件查询当前页记录 -->
+    <select id="findPageObjects"
+            resultType="com.cy.pj.sys.entity.SysLog">
+           select *
+           <include refid="queryWhereId"/>    
+           order by createdTime desc
+           limit #{startIndex},#{pageSize} 
+    </select>
+    
+</mapper>
+
+
+

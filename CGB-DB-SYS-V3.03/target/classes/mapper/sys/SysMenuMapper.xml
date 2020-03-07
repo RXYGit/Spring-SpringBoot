@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cy.pj.sys.dao.SysMenuDao">
+
+    <resultMap type="com.cy.pj.sys.vo.SysUserMenuVo" 
+               id="sysUserMenuVo">
+         <id  property="id" column="pid"/>
+         <result property="name" column="pname"/>
+         <result property="url" column="purl"/>
+         <collection property="childs" ofType="com.cy.pj.sys.vo.SysUserMenuVo">
+            <id  property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="url" column="url"/>
+         </collection>
+    </resultMap>
+    <!-- 查询用户对应的菜单信息(查询用户对应一级菜单一级此菜单下的二级菜单) -->
+    <select id="findUserMenus" resultMap="sysUserMenuVo">
+        select p.id pid,p.name pname,p.url purl,c.id,c.name,c.url
+        from  sys_menus p join sys_menus c
+        on  c.parentId=p.id
+        <where>
+          <foreach collection="array"
+                   open="("
+                   close=")"
+                   separator="or"
+                   item="menuId">
+                  c.id=#{menuId}
+          </foreach>
+          and p.parentId is null 
+        </where>
+    </select>
+    
+    <!-- 基于菜单id获取授权标识 -->
+    <select id="findPermissions" resultType="string">
+         select  permission
+         from sys_menus
+         <where>
+         <foreach collection="menuIds"
+                  separator="or"
+                  item="menuId">
+              id=#{menuId}         
+         </foreach>    
+         </where> 
+    </select>
+    
+	<update id="updateObject" parameterType="com.cy.pj.sys.entity.SysMenu">
+		 update sys_menus
+         set
+           name=#{name},
+           type=#{type},
+           sort=#{sort},
+           url=#{url},
+           parentId=#{parentId},
+           permission=#{permission},
+           modifiedUser=#{modifiedUser},
+           modifiedTime=now()
+        where id=#{id}
+	</update>
+	
+	<insert id="insertObject"
+		parameterType="com.cy.pj.sys.entity.SysMenu">
+		insert into sys_menus
+		(name,url,type,sort,note,parentId,permission,
+		createdTime,modifiedTime,createdUser,modifiedUser)
+		values
+		(#{name},#{url},#{type},#{sort},#{note},#{parentId},
+		#{permission},now(),now(),#{createdUser},#{modifiedUser})
+	</insert>
+
+  
+    <!-- 查询所有菜单以及菜单对应的上级菜单id和名称 -->
+    <select id="findObjects" resultType="com.cy.pj.sys.entity.SysMenu">
+         <!--方案1: 表关联查询(自关联,左外连接) -->
+         <!--  
+         select c.*,p.name parentName
+         from sys_menus c left join sys_menus p
+         on c.parentId=p.id
+         -->
+         <!--方案2: 嵌套查询 (先查询所有菜单,再查询菜单对应的上级菜单)-->
+         select c.*,(select p.name
+                     from sys_menus p
+                     where c.parentId=p.id) parentName
+         from sys_menus c
+         
+    </select>
+</mapper>
+
+
+

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cy.pj.sys.dao.SysUserDao">
+
+    <!-- 更新用户自身信息 -->
+    <update id="updateObject"
+            parameterType="com.cy.pj.sys.entity.SysUser">
+		update sys_users
+		set username=#{username},
+			mobile=#{mobile},
+			email=#{email},
+			deptId=#{deptId},
+			modifiedTime=now(),
+			modifiedUser=#{modifiedUser}
+		where id=#{id}
+    </update>
+    <!-- 基于用户id查询用户以及用户对应的部门信息 -->    
+    <select id="findObjectById" resultMap="sysUserDeptVo">
+          select u.*,d.name,d.note
+          from sys_users u left join sys_depts d
+          on u.deptId=d.id
+          where u.id=#{id}
+    </select>
+
+    <insert id="insertObject"
+            parameterType="com.cy.pj.sys.entity.SysUser">
+      <!-- 可以借助selectKey元素获取一个数据(一般和主键有关) 
+       order 属性用于指定selectKey元素在insert之前还是之后执行,after表示之后
+       keyProperty属性用于指定selectKey元素的返回结果赋值给参数对象的哪个属性
+      -->
+      <selectKey order="AFTER" keyProperty="id" resultType="int">
+           <!-- 获取最后一次insert操作使用的递增主键值 -->
+           select last_insert_id()
+      </selectKey>
+      insert into sys_users
+      (username,password,deptId,email,mobile,salt,valid,
+      createdTime,modifiedTime,createdUser,modifiedUser)
+      values
+      (#{username},#{password},#{deptId},#{email},#{mobile},#{salt},#{valid},
+      now(),now(),#{createdUser},#{modifiedUser})
+            
+    </insert>
+
+    <!-- 通过sql元素定义sql共性代码,其它地方用到了使用include进行包含 -->
+    <sql id="queryWhereId">
+          from sys_users u left join sys_depts d
+          on u.deptId=d.id
+          <where>
+             <if test="username!=null and username!=''">
+                username like concat("%",#{username},"%")
+             </if>
+          </where>   
+    </sql>
+    <resultMap id="sysUserDeptVo"
+               type="com.cy.pj.sys.vo.SysUserDeptVo">
+           <id column="id" property="id"/>
+           <result column="username" property="username"/>
+           <result column="mobile" property="mobile"/>
+           <result column="email" property="email"/>
+           <result column="valid" property="valid"/>
+           <result column="createdTime" property="createdTime"/>
+           <result column="modifiedTime" property="modifiedTime"/>
+           <!-- one2one,many2one,嵌套查询 -->
+           <association property="sysDept" 
+                        javaType="com.cy.pj.sys.entity.SysDept">
+                   <id column="deptId" property="id"/>
+                   <result column="name" property="name"/>
+                   <result column="note" property="note"/>
+           </association>
+    </resultMap>
+    <!-- 基于用户名,动态拼接sql实现数据查询 -->
+    <select id="getRowCount" resultType="int">
+          select count(*)
+          <include refid="queryWhereId"/>    
+    </select>
+    <!-- 基于查询条件查询当前页记录 -->
+    <select id="findPageObjects"
+            resultMap="sysUserDeptVo">
+           select u.*,d.name,d.note
+           <include refid="queryWhereId"/>    
+           order by u.createdTime desc
+           limit #{startIndex},#{pageSize} 
+    </select>
+</mapper>

@@ -1,0 +1,17 @@
+{
+  "groups": [
+    {
+      "name": "page.config",
+      "type": "com.cy.pj.common.config.PaginationProperties",
+      "sourceType": "com.cy.pj.common.config.PaginationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "page.config.page-size",
+      "type": "java.lang.Integer",
+      "sourceType": "com.cy.pj.common.config.PaginationProperties"
+    }
+  ],
+  "hints": []
+}
