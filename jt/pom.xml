@@ -1,0 +1,157 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.jt.1910</groupId>
+	<artifactId>jt</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<!--表示该项目是一个聚合项目 -->
+	<packaging>pom</packaging>
+
+	<!--稍后引入公共的jar包程序 -->
+	<!--导入公共的jar包文件 spring springmvc 并且定义2.2.4的相关联的jar包版本 防止jar包冲突. -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.2.4.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<!--springBoot环境变量配置信息 -->
+	<properties>
+		<java.version>1.8</java.version>
+		<!--指定maven插件版本 -->
+		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+	</properties>
+
+	<!--项目的依赖项 -->
+	<dependencies>
+		<!--SpringMVC 传统方法需要手动的配置 springboot程序自动化部署. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<!--springboot的启动器包 -->
+			<!--maven中的jar包具有依赖的传递性 -->
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!--springboot启动项 加载test测试 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!--添加属性注入依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!--引入插件lombok 自动的set/get/构造方法插件 -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<!--支持热部署 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+
+		<!--引入数据库驱动 -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+			<version>5.1.32</version>
+			<!--低版本的mysql 数据库代理服务器 -->
+		</dependency>
+
+		<!--springBoot数据库连接 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+
+		<!--spring整合mybatis-plus -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+
+		<!--springBoot整合JSP添加依赖 -->
+		<!--servlet依赖 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+		</dependency>
+
+		<!--jstl依赖 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+		</dependency>
+
+		<!--使jsp页面生效 -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		</dependency>
+
+		<!-- 引入aop支持 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<!--springBoot整合redis -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+		</dependency>
+
+		<!--添加httpClient jar包 -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+
+		<!--引入dubbo配置 -->
+		<dependency> 
+			<groupId>com.alibaba.boot</groupId> 
+			<artifactId>dubbo-spring-boot-starter</artifactId> 
+			<version>0.2.0</version> 
+		</dependency> 
+
+		<!--添加Quartz的支持 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-quartz</artifactId>
+		</dependency>
+	</dependencies>
+
+	<!--父级项目中,不要添加任何插件 -->
+
+	<!--项目模块 -->
+	<modules>
+		<module>jt-common</module>
+		<module>jt-manage</module>
+		<module>jt-web</module>
+		<module>jt-sso</module>
+		<module>jt-cart</module>
+		<module>jt-order</module>
+	</modules>
+</project>

@@ -1,0 +1,30 @@
+server:
+  port: 8095
+  servlet:    context-path: /
+spring:  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/jtdb?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
+    username: root
+    password: root
+
+#mybatis-plush配置
+mybatis-plus:  type-aliases-package: com.jt.pojo
+  mapper-locations: classpath:/mybatis/mappers/*.xml
+  configuration:
+    map-underscore-to-camel-case: true  
+#引入日志信息
+logging:
+  level: 
+    com.jt.mapper: debug
+
+#dubbo配置    
+dubbo:
+  scan:
+    basePackages: com.jt
+  application:
+    name: provider-order
+  registry:
+    address: zookeeper://192.168.17.128:2181?backup=192.168.17.128:2182,192.168.17.128:2183
+  protocol:
+    name: dubbo
+    port: 20882

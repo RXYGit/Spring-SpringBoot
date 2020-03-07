@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jt.mapper.ItemMapper">
+	<!--留着以后用  -->
+	
+	<!--实现数据库的批量删除操作  Long[] id  如何循环遍历数组
+		参数1: @Param("ids")Long[] ids  collection="ids"
+		结论1:如果参数使用map方式进行封装则写key
+		参数2:Long[] ids   collection="array"
+		参数3:List ids     collection="array"
+		结论2: 如果参数使用数组/list集合进行封装 则写array
+	-->
+	<delete id="deleteItems">
+		delete from tb_item where id in (
+			<foreach collection="array" separator="," item="id">
+				#{id}
+			</foreach>
+		)
+	</delete>
+</mapper>
